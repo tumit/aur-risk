@@ -19,10 +19,6 @@ pub struct AurPackage {
 
   #[serde(rename = "Popularity")]
   pub popularity: f64,
-
-  #[serde(rename = "OutOfDate")]
-  pub out_of_date: Option<i64>,
-
 }
 
 pub fn get_package(name: &str) -> Result<AurPackage, Box<dyn std::error::Error>> {
