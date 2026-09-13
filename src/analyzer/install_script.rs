@@ -1,3 +1,5 @@
+use crate::pkgbuild::{PKGBuild};
+
 use super::{Analyzer, Finding};
 
 pub struct InstallScriptAnalyzer;
@@ -7,40 +9,64 @@ impl Analyzer for InstallScriptAnalyzer {
         "InstallScript"
     }
 
-    fn analyze(&self, content: &str) -> Vec<Finding> {
-        let mut findings = Vec::new();
+    fn analyze(&self, pkgbuild: &PKGBuild) -> Vec<Finding> {
 
-        let mut inside_package = false;
+        // let mut findings = Vec::new();
 
-        for line in content.lines() {
-            let trimmed = line.trim();
+        // let mut inside_package = false;
+        // let mut brace_depth = 0;
 
-            if trimmed.starts_with("package()") {
-                inside_package = true;
-                continue;
-            }
+        let dangerous = ["sudo", "systemctl", "curl", "wget", "rm -rf"];
 
-            if inside_package && trimmed == "}" {
-                inside_package = false;
-                continue;
-            }
+        pkgbuild
+            .package_lines
+            .iter()
+            .filter(|line| {
+                dangerous
+                    .iter()
+                    .any(|cmd| line.contains(cmd))
+            })
+            .map(|line| Finding {
+                rule: self.name().to_string(),
+                message: format!(
+                    "Suspicious command in package(): {}",
+                    line.trim()
+                ),
+            })
+            .collect()
 
-            if inside_package {
-                let dangerous = ["sudo", "systemctl", "curl", "wget", "rm -rf"];
+        // for line in pkgbuild.content.lines() {
+        //     let line_trimmed = line.trim();
 
-                for command in dangerous {
-                    if trimmed.contains(command) {
-                        findings.push(Finding {
-                            rule: self.name().to_string(),
-                            message: format!("Suspicious command in package(): {}", trimmed),
-                        });
+        //     if line_trimmed.starts_with("package()") {
+        //         inside_package = true;
+        //     }
 
-                        break;
-                    }
-                }
-            }
-        }
+        //     if inside_package {
 
-        findings
+        //         if dangerous
+        //             .iter()
+        //             .any(|command| line_trimmed.contains(command))
+        //         {
+        //             findings.push(Finding {
+        //                 rule: self.name().to_string(),
+        //                 message: format!(
+        //                     "Suspicious command in package(): {}",
+        //                     line_trimmed
+        //                 ),
+        //             });
+        //         }
+        //     }
+
+        //     brace_depth += line_trimmed.matches('{').count();
+        //     brace_depth -= line_trimmed.matches('}').count();
+
+        //     if inside_package && brace_depth == 0 {
+        //         inside_package = false;
+        //     }
+
+        // }
+
+        // findings
     }
 }

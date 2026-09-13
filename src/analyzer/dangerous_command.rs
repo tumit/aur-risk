@@ -1,3 +1,5 @@
+use crate::pkgbuild::PKGBuild;
+
 use super::{Analyzer, Finding};
 
 pub struct DangerousCommandAnalyzer;
@@ -8,10 +10,10 @@ impl Analyzer for DangerousCommandAnalyzer {
       "DangerousCommand"
   }
 
-  fn analyze(&self, content: &str) -> Vec<Finding> {
+  fn analyze(&self, pkgbuild: &PKGBuild) -> Vec<Finding> {
     let dangerous_commands = ["curl", "wget", "sudo", "systemctl"];
 
-    content
+    pkgbuild.content
       .lines()
       .filter(|line| {
         dangerous_commands

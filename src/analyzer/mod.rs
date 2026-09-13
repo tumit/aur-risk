@@ -6,7 +6,7 @@ pub struct Finding {
 
 pub trait Analyzer {
   fn name(&self) -> &str;
-  fn analyze(&self, content: &str) -> Vec<Finding>;
+  fn analyze(&self, pkgbuild: &PKGBuild) -> Vec<Finding>;
 }
 
 mod dangerous_command;
@@ -20,6 +20,8 @@ pub use checksum::ChecksumAnalyzer;
 
 mod install_script;
 pub use install_script::InstallScriptAnalyzer;
+
+use crate::pkgbuild::PKGBuild;
 
 // pub fn analyze_all(
 //   content: &str,

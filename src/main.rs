@@ -20,8 +20,9 @@ struct Cli {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
+    let content: String = pkgbuild::download(&cli.package)?;
 
-    let content = pkgbuild::download(&cli.package)?;
+    let pkgbuild = pkgbuild::parse(content);
 
     println!("Analyzing {}...\n", cli.package);
 
@@ -35,7 +36,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut findings = Vec::new();
 
     for analyzer in &analyzers {
-        let results = analyzer.analyze(&content);
+        let results = analyzer.analyze(&pkgbuild);
         if results.is_empty() {
             println!("✓ {:<20} 0 findings", analyzer.name());
         } else {

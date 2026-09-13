@@ -1,3 +1,5 @@
+use crate::pkgbuild::{PKGBuild};
+
 use super::{Analyzer, Finding};
 
 pub struct ChecksumAnalyzer;
@@ -7,8 +9,8 @@ impl Analyzer for ChecksumAnalyzer {
     "Checksum"
   }
 
-  fn analyze(&self, content: &str) -> Vec<Finding> {
-      content
+  fn analyze(&self, pkgbuild: &PKGBuild) -> Vec<Finding> {
+      pkgbuild.content
           .lines()
           .filter(|line| {
               line.contains("sha256sums=('SKIP')")
